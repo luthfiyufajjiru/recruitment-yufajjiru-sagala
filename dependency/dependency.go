@@ -49,3 +49,23 @@ func InitTodoV1HttpHandler(cfg adapters.Config) *v1http.V1Handler {
 	)
 	return nil
 }
+
+func InitMigration(cfg adapters.Config) map[string]*adapters.Sql {
+	wire.Build(
+		wire.Value([]string{
+			constants.DSNDefault,
+		}),
+		wire.Value([]adapters.SqlConfig{
+			{
+				RegistryName: constants.ConnSqlDefault,
+				DriverName:   constants.SqliteDriver,
+				MaxLifeTime:  1,
+				MaxIdleTime:  5,
+				MaxIdleConns: 10,
+				MaxOpenConns: 100,
+			},
+		}),
+		provideSql,
+	)
+	return nil
+}

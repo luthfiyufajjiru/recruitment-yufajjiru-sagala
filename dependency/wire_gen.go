@@ -51,3 +51,24 @@ var (
 	}
 	_wireValue2 = []string{constants.DSNDefault}
 )
+
+func InitMigration(cfg adapters.Config) map[string]*adapters.Sql {
+	v := _wireValue3
+	v2 := _wireValue4
+	v3 := provideSql(cfg, v, v2)
+	return v3
+}
+
+var (
+	_wireValue3 = []adapters.SqlConfig{
+		{
+			RegistryName: constants.ConnSqlDefault,
+			DriverName:   constants.SqliteDriver,
+			MaxLifeTime:  1,
+			MaxIdleTime:  5,
+			MaxIdleConns: 10,
+			MaxOpenConns: 100,
+		},
+	}
+	_wireValue4 = []string{constants.DSNDefault}
+)

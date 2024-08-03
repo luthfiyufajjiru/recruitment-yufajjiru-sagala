@@ -20,6 +20,13 @@ var statusMap = map[string]int8{
 }
 
 func (u *TodoUsecase) GetTask(taskId string) (record model.TaskPresenter, err error) {
+	query := squirrel.Select("*").From(tasksTable).Where("(deleted_at is null OR deleted_at = 0)").Where("id = ?", taskId)
+	queryStr, args := query.MustSql()
+
+	err = u.Sql[constants.ConnSqlDefault].Db.Get(&record, queryStr, args...)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return
+	}
 	return
 }
 func (u *TodoUsecase) GetTasks(limit, offset *int, search, status *string) (records []model.TaskPresenter, totalData int, err error) {

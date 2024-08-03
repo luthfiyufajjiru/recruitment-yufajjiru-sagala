@@ -48,6 +48,46 @@ func (u *TodoUsecase) PostTask(payload model.TaskDTO) (taskId string, err error)
 	return
 }
 func (u *TodoUsecase) UpdateTask(taskId string, payload model.TaskDTO) (err error) {
+	var taskIdRet string
+	if !payload.Status.Valid || statusMap[payload.Status.String] < 1 {
+		err = &customerror.HttpError{
+			Message:    "invalid status",
+			StatusCode: http.StatusBadRequest,
+		}
+		return
+	}
+
+	if !payload.Content.Valid || payload.Content.String == "" {
+		err = &customerror.HttpError{
+			Message:    "content could not be empty",
+			StatusCode: http.StatusBadRequest,
+		}
+		return
+	}
+
+	payload.UpdateNow()
+
+	query := squirrel.Update(tasksTable).
+		Set("content", payload.Content.String).
+		Set("status", payload.Status.String).
+		Set("updated_at", payload.UpdatedAt).
+		Where("id = ?", taskId).
+		Where("(deleted_at is null OR deleted_at = 0)").
+		Suffix("returning id")
+
+	queryStr, args := query.MustSql()
+
+	err = u.Sql[constants.ConnSqlDefault].Db.Get(&taskIdRet, queryStr, args...)
+	errNoRow := errors.Is(err, sql.ErrNoRows)
+	if err != nil && !errNoRow {
+		return
+	} else if err != nil && errNoRow {
+		err = &customerror.HttpError{
+			Message:    fmt.Sprintf("there is no task with id of %s", taskId),
+			StatusCode: http.StatusNotFound,
+		}
+		return
+	}
 	return
 }
 func (u *TodoUsecase) DeleteTask(taskId string, isHardDelete bool) (err error) {

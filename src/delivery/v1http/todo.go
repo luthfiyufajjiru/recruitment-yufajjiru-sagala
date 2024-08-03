@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"sagala-todo/pkg/common"
 	"sagala-todo/pkg/constants"
@@ -83,6 +84,55 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			fmt.Fprint(w, string(mRecord))
 			return
 		case http.MethodPut:
+			var payload model.TaskDTO
+			fn := new(common.LeastError)
+
+			fn.Do(func() (err error) {
+				bt, err := io.ReadAll(r.Body)
+				if err != nil {
+					logger.Error(err)
+					err = &customerror.HttpError{
+						Message:    fmt.Sprintf("failed read body request: %s", constants.ErrCodeFailedReadBodyRequest),
+						StatusCode: http.StatusInternalServerError,
+						Err:        err,
+					}
+					return
+				}
+
+				err = json.Unmarshal(bt, &payload)
+				if err != nil {
+					logger.Error(err)
+					err = &customerror.HttpError{
+						Message:    fmt.Sprintf("invalid payload: %s", constants.ErrInvalidPayload),
+						StatusCode: http.StatusBadRequest,
+						Err:        err,
+					}
+					return
+				}
+				return
+			})
+
+			fn.Do(func() (err error) {
+				err = h.Useacse.UpdateTask(id, payload)
+				return
+			})
+
+			err := fn.Err()
+			asMsgError := errors.As(err, &msgError)
+
+			if asMsgError {
+				w.WriteHeader(msgError.StatusCode)
+				fmt.Fprintf(w, msgError.Message)
+				return
+			} else if err != nil {
+				delivery.HandleUnhandledError(w, err, logger)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+			fmt.Fprint(w, constants.MsgSuccess)
+			return
 		case http.MethodDelete:
 			fn := new(common.LeastError)
 

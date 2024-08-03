@@ -28,7 +28,10 @@ func (u *TodoUsecase) GetTask(taskId string) (record model.TaskPresenter, err er
 	if err != nil && !errNoRow {
 		return
 	} else if err != nil && errNoRow {
-		err = nil
+		err = &customerror.HttpError{
+			Message:    fmt.Sprintf("there is no task with id of %s", taskId),
+			StatusCode: http.StatusNotFound,
+		}
 		return
 	}
 	return

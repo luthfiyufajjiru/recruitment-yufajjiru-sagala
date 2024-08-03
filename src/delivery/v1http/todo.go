@@ -17,6 +17,10 @@ import (
 )
 
 func (h *V1Handler) RootHandler() http.HandlerFunc {
+	const handlerName = "RootHandler"
+	logger := logger.WithFields(logrus.Fields{
+		constants.LFKHandlerName: handlerName,
+	})
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:

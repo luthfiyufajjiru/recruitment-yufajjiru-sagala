@@ -147,7 +147,6 @@ func (h *V1Handler) RootHandler() http.HandlerFunc {
 				if ok := queryParams.Has(paramsLookup[3]); ok {
 					status = new(string)
 					*status = queryParams.Get(paramsLookup[3])
-					logger.Info(*status)
 				}
 				return
 			})

@@ -66,6 +66,7 @@ func (h *V1Handler) RootHandler() http.HandlerFunc {
 			asMsgError := errors.As(err, &msgError)
 
 			if asMsgError {
+				w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
 				w.WriteHeader(msgError.StatusCode)
 				fmt.Fprintf(w, msgError.Message)
 				return
@@ -74,8 +75,8 @@ func (h *V1Handler) RootHandler() http.HandlerFunc {
 				return
 			}
 
-			w.WriteHeader(http.StatusOK)
 			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, taskId)
 			return
 		case http.MethodGet:
@@ -97,6 +98,7 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 
 		id := r.PathValue("id")
 		if id == "" {
+			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprint(w, constants.ErrMsgEmptyId)
 			return
@@ -129,6 +131,7 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			asMsgError := errors.As(err, &msgError)
 
 			if asMsgError {
+				w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
 				w.WriteHeader(msgError.StatusCode)
 				fmt.Fprintf(w, msgError.Message)
 				return
@@ -137,8 +140,8 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 				return
 			}
 
-			w.WriteHeader(http.StatusOK)
 			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderApplicationJSON)
+			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, string(mRecord))
 			return
 		case http.MethodPut:
@@ -178,6 +181,7 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			asMsgError := errors.As(err, &msgError)
 
 			if asMsgError {
+				w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
 				w.WriteHeader(msgError.StatusCode)
 				fmt.Fprintf(w, msgError.Message)
 				return
@@ -186,8 +190,8 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 				return
 			}
 
-			w.WriteHeader(http.StatusOK)
 			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, constants.MsgSuccess)
 			return
 		case http.MethodDelete:
@@ -203,6 +207,7 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			asMsgError := errors.As(err, &msgError)
 
 			if asMsgError {
+				w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
 				w.WriteHeader(msgError.StatusCode)
 				fmt.Fprintf(w, msgError.Message)
 				return
@@ -211,8 +216,8 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 				return
 			}
 
-			w.WriteHeader(http.StatusOK)
 			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, constants.MsgSuccess)
 			return
 		default:

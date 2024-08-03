@@ -14,15 +14,15 @@ const (
 )
 
 func HandleUnknownHttpMethod(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusNotFound)
 	w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+	w.WriteHeader(http.StatusNotFound)
 	fmt.Fprint(w, UnknownHttpMethod)
 }
 
 func HandleUnhandledError(w http.ResponseWriter, err error, logger *logrus.Entry) {
 	errorId := uuid.NewString()
 	logger.WithField(constants.LFKErrorId, errorId).Error(err)
-	w.WriteHeader(http.StatusInternalServerError)
 	w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+	w.WriteHeader(http.StatusInternalServerError)
 	fmt.Fprintf(w, "unhandled error, error id: %s", errorId)
 }

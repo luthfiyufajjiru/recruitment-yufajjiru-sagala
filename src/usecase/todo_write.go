@@ -12,9 +12,39 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/google/uuid"
 )
 
 func (u *TodoUsecase) PostTask(payload model.TaskDTO) (taskId string, err error) {
+	if !payload.Content.Valid || payload.Content.String == "" {
+		err = &customerror.HttpError{
+			Message:    "content could not be empty",
+			StatusCode: http.StatusBadRequest,
+		}
+		return
+	}
+
+	if !payload.Status.Valid || statusMap[payload.Status.String] < 1 {
+		payload.Status.SetValue("Waiting List") // default status
+	}
+
+	taskId = uuid.NewString() // uuid is not the best option for simple task to perform but since we are using sqlite, uuid is simpliest implementation right now
+	payload.InsertNow()
+
+	query := squirrel.Insert(tasksTable).Columns("id", "content", "status", "created_at", "updated_at", "deleted_at").Values(taskId, payload.Content.String, payload.Status.String, payload.CreatedAt.Int64, payload.UpdatedAt.Int64, 0)
+	queryStr, args := query.MustSql()
+	var res sql.Result
+	res, err = u.Sql[constants.ConnSqlDefault].Db.Exec(queryStr, args...)
+	n, _ := res.RowsAffected()
+	if err != nil {
+		return
+	} else if n < 1 {
+		err = &customerror.HttpError{
+			Message:    "failed posting task",
+			StatusCode: http.StatusInternalServerError,
+		}
+		return
+	}
 	return
 }
 func (u *TodoUsecase) UpdateTask(taskId string, payload model.TaskDTO) (err error) {

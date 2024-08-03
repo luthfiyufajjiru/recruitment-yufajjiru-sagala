@@ -80,6 +80,124 @@ func (h *V1Handler) RootHandler() http.HandlerFunc {
 			fmt.Fprint(w, taskId)
 			return
 		case http.MethodGet:
+			paramsLookup := []string{"limit", "offset", "search", "status"}
+			queryParams := r.URL.Query()
+
+			var (
+				limit, offset   *int
+				search, status  *string
+				tasksPresenter  []model.TaskPresenter
+				totalTasks      int
+				responseContent []byte
+			)
+
+			fn.Do(func() (err error) {
+				if ok := queryParams.Has(paramsLookup[0]); ok {
+					i, _err := strconv.Atoi(queryParams.Get(paramsLookup[0]))
+					if _err != nil {
+						err = &customerror.HttpError{
+							Message:    "limit should be a number",
+							StatusCode: http.StatusBadRequest,
+							Err:        _err,
+						}
+						return
+					}
+					limit = &i
+				} else if !ok {
+					err = &customerror.HttpError{
+						Message:    "limit could not be empty",
+						StatusCode: http.StatusBadRequest,
+					}
+					return
+				}
+				return
+			})
+
+			fn.Do(func() (err error) {
+				if ok := queryParams.Has(paramsLookup[1]); ok {
+					i, _err := strconv.Atoi(queryParams.Get(paramsLookup[1]))
+					if _err != nil {
+						err = &customerror.HttpError{
+							Message:    "offset should be a number",
+							StatusCode: http.StatusBadRequest,
+							Err:        _err,
+						}
+						return
+					}
+					offset = &i
+				} else if !ok {
+					err = &customerror.HttpError{
+						Message:    "offset could not be empty",
+						StatusCode: http.StatusBadRequest,
+					}
+					return
+				}
+				return
+			})
+
+			fn.Do(func() (err error) {
+				if ok := queryParams.Has(paramsLookup[2]); ok {
+					search = new(string)
+					*search = queryParams.Get(paramsLookup[2])
+				}
+				return
+			})
+
+			fn.Do(func() (err error) {
+				if ok := queryParams.Has(paramsLookup[3]); ok {
+					status = new(string)
+					*status = queryParams.Get(paramsLookup[3])
+					logger.Info(*status)
+				}
+				return
+			})
+
+			fn.Do(func() (err error) {
+				tasksPresenter, totalTasks, err = h.Usecase.GetTasks(limit, offset, search, status)
+				return
+			})
+
+			fn.Do(func() (err error) {
+				bt, err := json.Marshal(tasksPresenter)
+				if err != nil {
+					err = &customerror.HttpError{
+						Message:    constants.ErrMsgFailedSerializeRecord,
+						StatusCode: http.StatusInternalServerError,
+						Err:        err,
+					}
+					return
+				}
+				resp := json.RawMessage(fmt.Sprintf("{\"message\":\"success\", \"data\":%s, \"total_data\":%d}", string(bt), totalTasks))
+				responseContent, err = resp.MarshalJSON()
+				if err != nil {
+					responseContent = nil
+					err = &customerror.HttpError{
+						Message:    constants.ErrMsgFailedSerializeRecord,
+						StatusCode: http.StatusInternalServerError,
+						Err:        err,
+					}
+					return
+				}
+				return
+			})
+
+			err := fn.Err()
+			asMsgError := errors.As(err, &msgError)
+
+			if asMsgError {
+				w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+				w.WriteHeader(msgError.StatusCode)
+				fmt.Fprintf(w, msgError.Message)
+				return
+			} else if err != nil {
+				delivery.HandleUnhandledError(w, err, logger)
+				return
+			}
+
+			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderApplicationJson)
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, string(responseContent))
+			return
 		default:
 			delivery.HandleUnknownHttpMethod(w)
 			return

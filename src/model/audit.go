@@ -1,6 +1,9 @@
 package model
 
-import "sagala-todo/pkg/nullable"
+import (
+	"sagala-todo/pkg/nullable"
+	"time"
+)
 
 type (
 	Audit struct {
@@ -12,3 +15,14 @@ type (
 		DeletedAt nullable.NullInt64  `json:"deleted_at" db:"deleted_at"`
 	}
 )
+
+func (a *Audit) InsertNow() {
+	now := time.Now().Unix()
+	a.CreatedAt.SetValue(now)
+	a.UpdatedAt.SetValue(now)
+}
+
+func (a *Audit) UpdateNow() {
+	now := time.Now().Unix()
+	a.UpdatedAt.SetValue(now)
+}

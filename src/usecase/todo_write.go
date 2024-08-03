@@ -8,6 +8,6 @@ func (u *TodoUsecase) PostTask(payload model.TaskDTO) (taskId string, err error)
 func (u *TodoUsecase) UpdateTask(taskId string, payload model.TaskDTO) (err error) {
 	return
 }
-func (u *TodoUsecase) DeleteTask(taskId string, isSoftDelete bool) (err error) {
+func (u *TodoUsecase) DeleteTask(taskId string, isHardDelete bool) (err error) {
 	return
 }

@@ -30,7 +30,7 @@ func InitHttpServer(ctx context.Context, cfg adapters.Config, wg *sync.WaitGroup
 	v1Todo := dependency.InitTodoV1HttpHandler(cfg)
 
 	mux.Handle("/v1", middleware.RequestLogger(v1Todo.RootHandler()))
-	mux.Handle("/v1/{id}", middleware.RequestLogger(v1Todo.RootHandler()))
+	mux.Handle("/v1/{id}", middleware.RequestLogger(v1Todo.TaskDetail()))
 
 	go func(wg *sync.WaitGroup) {
 		<-ctx.Done()

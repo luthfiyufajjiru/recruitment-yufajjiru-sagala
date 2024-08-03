@@ -22,8 +22,62 @@ func (h *V1Handler) RootHandler() http.HandlerFunc {
 		constants.LFKHandlerName: handlerName,
 	})
 	return func(w http.ResponseWriter, r *http.Request) {
+		var msgError *customerror.HttpError
+		fn := new(common.LeastError)
+
 		switch r.Method {
 		case http.MethodPost:
+			var (
+				taskId  string
+				payload model.TaskDTO
+			)
+
+			fn.Do(func() (err error) {
+				bt, err := io.ReadAll(r.Body)
+				if err != nil {
+					logger.Error(err)
+					err = &customerror.HttpError{
+						Message:    fmt.Sprintf("failed read body request: %s", constants.ErrCodeFailedReadBodyRequest),
+						StatusCode: http.StatusInternalServerError,
+						Err:        err,
+					}
+					return
+				}
+
+				err = json.Unmarshal(bt, &payload)
+				if err != nil {
+					logger.Error(err)
+					err = &customerror.HttpError{
+						Message:    fmt.Sprintf("invalid payload: %s", constants.ErrInvalidPayload),
+						StatusCode: http.StatusBadRequest,
+						Err:        err,
+					}
+					return
+				}
+				return
+			})
+
+			fn.Do(func() (err error) {
+				taskId, err = h.Usecase.PostTask(payload)
+				return
+			})
+
+			err := fn.Err()
+			asMsgError := errors.As(err, &msgError)
+
+			if asMsgError {
+				w.WriteHeader(msgError.StatusCode)
+				fmt.Fprintf(w, msgError.Message)
+				return
+			} else if err != nil {
+				delivery.HandleUnhandledError(w, err, logger)
+				return
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Header().Set(constants.HeaderKeyContentType, constants.HeaderTextPlain)
+			fmt.Fprint(w, taskId)
+			return
 		case http.MethodGet:
 		default:
 			delivery.HandleUnknownHttpMethod(w)

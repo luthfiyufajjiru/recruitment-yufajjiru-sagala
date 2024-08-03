@@ -11,6 +11,7 @@ type (
 
 	TaskPresenter struct {
 		Audit
+		Id      nullable.NullString `json:"id" db:"id"`
 		Content nullable.NullString `json:"content" db:"content"`
 		Status  nullable.NullString `json:"status" db:"status"`
 		// This presentre migh be similar with DTO right now, but better to split due to additional response further development

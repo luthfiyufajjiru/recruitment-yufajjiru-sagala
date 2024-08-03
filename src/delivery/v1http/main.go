@@ -21,6 +21,6 @@ type (
 
 	V1Handler struct {
 		Config  adapters.Config
-		Useacse Usecaser
+		Usecase Usecaser
 	}
 )

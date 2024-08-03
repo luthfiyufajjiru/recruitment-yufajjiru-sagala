@@ -50,7 +50,7 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			var mRecord []byte
 
 			fn.Do(func() (err error) {
-				record, err = h.Useacse.GetTask(id)
+				record, err = h.Usecase.GetTask(id)
 				return
 			})
 
@@ -113,7 +113,7 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			})
 
 			fn.Do(func() (err error) {
-				err = h.Useacse.UpdateTask(id, payload)
+				err = h.Usecase.UpdateTask(id, payload)
 				return
 			})
 
@@ -140,7 +140,7 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			isHardDelete, _ := strconv.ParseBool(isHardDeleteStr)
 
 			fn.Do(func() (err error) {
-				err = h.Useacse.DeleteTask(id, isHardDelete)
+				err = h.Usecase.DeleteTask(id, isHardDelete)
 				return
 			})
 

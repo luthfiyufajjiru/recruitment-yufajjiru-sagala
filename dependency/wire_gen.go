@@ -33,7 +33,7 @@ func InitTodoV1HttpHandler(cfg adapters.Config) *v1http.V1Handler {
 	todoUsecase := usecase.ProvideUsecase(v3, cfg)
 	v1Handler := &v1http.V1Handler{
 		Config:  cfg,
-		Useacse: todoUsecase,
+		Usecase: todoUsecase,
 	}
 	return v1Handler
 }

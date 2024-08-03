@@ -4,6 +4,8 @@ import (
 	customlog "sagala-todo/pkg/custom-log"
 	"time"
 
+	_ "github.com/mattn/go-sqlite3" // import SQLite driver
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
@@ -27,7 +29,7 @@ type (
 func (s *Sql) Init(cfg *SqlConfig) {
 	sqlDB, err := sqlx.Open(cfg.DriverName, cfg.Dsn)
 	if err != nil {
-		logger.Panic("error occurred while connecting with the database")
+		logger.Panic("error occurred while connecting with the database", err)
 	}
 
 	if cfg.MaxIdleTime > 0 {

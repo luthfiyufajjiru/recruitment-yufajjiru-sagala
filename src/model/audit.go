@@ -4,6 +4,7 @@ import "sagala-todo/pkg/nullable"
 
 type (
 	Audit struct {
+		// fields *By might not be used right now but prepared it as a standard
 		CreatedAt nullable.NullInt64  `json:"created_at" db:"created_at"`
 		CreatedBy nullable.NullString `json:"created_by" db:"created_by"`
 		UpdatedAt nullable.NullInt64  `json:"updated_at" db:"updated_at"`

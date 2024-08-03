@@ -89,7 +89,6 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			return
 		case http.MethodPut:
 			var payload model.TaskDTO
-			fn := new(common.LeastError)
 
 			fn.Do(func() (err error) {
 				bt, err := io.ReadAll(r.Body)
@@ -138,8 +137,6 @@ func (h *V1Handler) TaskDetail() http.HandlerFunc {
 			fmt.Fprint(w, constants.MsgSuccess)
 			return
 		case http.MethodDelete:
-			fn := new(common.LeastError)
-
 			isHardDeleteStr := r.Header.Get("hard-delete")
 			isHardDelete, _ := strconv.ParseBool(isHardDeleteStr)
 

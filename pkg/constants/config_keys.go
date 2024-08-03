@@ -1,3 +1,6 @@
 package constants
 
-const ()
+const (
+	ENV  = "ENV"
+	PORT = "PORT"
+)

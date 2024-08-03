@@ -16,18 +16,22 @@ import (
 
 // Injectors from dependency.go:
 
+func InitConfiguration() adapters.Config {
+	config := provideConfiguration()
+	return config
+}
+
 func InitOsSignalChannel() chan os.Signal {
 	v := provideOsSignal()
 	return v
 }
 
-func InitTodoV1HttpHandler() *v1http.V1Handler {
-	config := provideConfiguration()
+func InitTodoV1HttpHandler(cfg adapters.Config) *v1http.V1Handler {
 	v := _wireValue
 	v2 := provideSql(v)
-	todoUsecase := usecase.ProvideUsecase(v2, config)
+	todoUsecase := usecase.ProvideUsecase(v2, cfg)
 	v1Handler := &v1http.V1Handler{
-		Config:  config,
+		Config:  cfg,
 		Useacse: todoUsecase,
 	}
 	return v1Handler

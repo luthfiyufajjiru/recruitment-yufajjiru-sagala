@@ -13,6 +13,13 @@ import (
 	"github.com/google/wire"
 )
 
+func InitConfiguration() adapters.Config {
+	wire.Build(
+		provideConfiguration,
+	)
+	return nil
+}
+
 func InitOsSignalChannel() chan os.Signal {
 	wire.Build(
 		provideOsSignal,
@@ -20,9 +27,8 @@ func InitOsSignalChannel() chan os.Signal {
 	return nil
 }
 
-func InitTodoV1HttpHandler() *v1http.V1Handler {
+func InitTodoV1HttpHandler(cfg adapters.Config) *v1http.V1Handler {
 	wire.Build(
-		provideConfiguration,
 		wire.Value([]adapters.SqlConfig{
 			{
 				RegistryName: constants.ConnSqlDefault,

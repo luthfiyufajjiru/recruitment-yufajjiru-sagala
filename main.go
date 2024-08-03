@@ -18,8 +18,9 @@ func main() {
 	logger := customlog.Logger
 
 	osCh := dependency.InitOsSignalChannel()
+	cfg := dependency.InitConfiguration()
 
 	go signalDisrupt(osCh, logger)
-	go cmd.InitHttpServer()
+	go cmd.InitHttpServer(cfg)
 	go cmd.InitAutomationTest()
 }

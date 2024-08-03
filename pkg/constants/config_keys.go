@@ -1,6 +1,7 @@
 package constants
 
 const (
-	ENV  = "ENV"
-	PORT = "PORT"
+	ENV        = "ENV"
+	ADDR       = "ADDR"
+	DSNDefault = "DSN_DEFAULT"
 )

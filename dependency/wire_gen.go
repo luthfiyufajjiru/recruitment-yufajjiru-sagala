@@ -28,8 +28,9 @@ func InitOsSignalChannel() chan os.Signal {
 
 func InitTodoV1HttpHandler(cfg adapters.Config) *v1http.V1Handler {
 	v := _wireValue
-	v2 := provideSql(v)
-	todoUsecase := usecase.ProvideUsecase(v2, cfg)
+	v2 := _wireValue2
+	v3 := provideSql(cfg, v, v2)
+	todoUsecase := usecase.ProvideUsecase(v3, cfg)
 	v1Handler := &v1http.V1Handler{
 		Config:  cfg,
 		Useacse: todoUsecase,
@@ -42,6 +43,11 @@ var (
 		{
 			RegistryName: constants.ConnSqlDefault,
 			DriverName:   constants.SqliteDriver,
+			MaxLifeTime:  1,
+			MaxIdleTime:  5,
+			MaxIdleConns: 10,
+			MaxOpenConns: 100,
 		},
 	}
+	_wireValue2 = []string{constants.DSNDefault}
 )

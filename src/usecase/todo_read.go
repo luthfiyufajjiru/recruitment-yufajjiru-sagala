@@ -24,7 +24,11 @@ func (u *TodoUsecase) GetTask(taskId string) (record model.TaskPresenter, err er
 	queryStr, args := query.MustSql()
 
 	err = u.Sql[constants.ConnSqlDefault].Db.Get(&record, queryStr, args...)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	errNoRow := errors.Is(err, sql.ErrNoRows)
+	if err != nil && !errNoRow {
+		return
+	} else if err != nil && errNoRow {
+		err = nil
 		return
 	}
 	return
@@ -61,14 +65,22 @@ func (u *TodoUsecase) GetTasks(limit, offset *int, search, status *string) (reco
 	queryStr, args := query.MustSql()
 
 	err = u.Sql[constants.ConnSqlDefault].Db.Select(&records, queryStr, args...)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	errNoRow := errors.Is(err, sql.ErrNoRows)
+	if err != nil && !errNoRow {
+		return
+	} else if err != nil && errNoRow {
+		err = nil
 		return
 	}
 
 	queryCount := queryBuilder("count(content)")
 	queryCountStr, argsCount := queryCount.MustSql()
 	err = u.Sql[constants.ConnSqlDefault].Db.Get(&totalData, queryCountStr, argsCount...)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	errNoRow = errors.Is(err, sql.ErrNoRows)
+	if err != nil && !errNoRow {
+		return
+	} else if err != nil && errNoRow {
+		err = nil
 		return
 	}
 	return

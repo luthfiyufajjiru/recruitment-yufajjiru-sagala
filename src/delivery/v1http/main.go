@@ -16,7 +16,7 @@ type (
 		UpdateTask(taskId string, payload model.TaskDTO) (err error)
 		DeleteTask(taskId string, isSoftDelete bool) (err error)
 		GetTask(taskId string) (record model.TaskPresenter, err error)
-		GetTasks() (records []model.TaskPresenter, err error)
+		GetTasks(limit, offset *int, search, status *string) (records []model.TaskPresenter, totalData int, err error)
 	}
 
 	V1Handler struct {

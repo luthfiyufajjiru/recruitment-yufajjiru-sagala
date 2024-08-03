@@ -35,7 +35,7 @@ func (u *TodoUsecase) GetTasks(limit, offset *int, search, status *string) (reco
 	}
 
 	queryBuilder := func(col ...string) squirrel.SelectBuilder {
-		query := squirrel.Select(col...).From(tasksTable)
+		query := squirrel.Select(col...).From(tasksTable).Where("(deleted_at is null OR deleted_at = 0)")
 
 		if search != nil && *search != "" {
 			*search = fmt.Sprintf("%%%s%%", strings.ToLower(*search))

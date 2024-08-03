@@ -1,0 +1,1 @@
+create table tasks(content varchar, status varchar, created_at bigint, created_by varchar, updated_at bigint, updated_by varchar, deleted_at bigint);

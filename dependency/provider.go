@@ -1,6 +1,7 @@
 package dependency
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"sagala-todo/pkg/adapters"
@@ -10,13 +11,14 @@ import (
 
 func provideConfiguration() (c adapters.Config) {
 	c = make(adapters.Config)
-	c.Load(common.RootDirectory())
+	c.Load(fmt.Sprintf("%s/.env", common.RootDirectory()))
 	return
 }
 
-func provideSql(cfgs []adapters.SqlConfig) (sql map[string]*adapters.Sql) {
+func provideSql(adCfg adapters.Config, cfgs []adapters.SqlConfig, dsns []string) (sql map[string]*adapters.Sql) {
 	sql = make(map[string]*adapters.Sql)
-	for _, cfg := range cfgs {
+	for i, cfg := range cfgs {
+		cfg.Dsn = adCfg[dsns[i]]
 		s := new(adapters.Sql)
 		s.Init(&cfg)
 		sql[cfg.RegistryName] = s

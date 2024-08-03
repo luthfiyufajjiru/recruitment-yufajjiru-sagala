@@ -2,8 +2,13 @@ package v1http
 
 import (
 	"sagala-todo/pkg/adapters"
+	customlog "sagala-todo/pkg/custom-log"
 	"sagala-todo/src/model"
+
+	"github.com/sirupsen/logrus"
 )
+
+var logger *logrus.Logger = customlog.Logger
 
 type (
 	Usecaser interface {

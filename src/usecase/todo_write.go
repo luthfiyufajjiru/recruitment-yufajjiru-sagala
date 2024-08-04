@@ -35,7 +35,10 @@ func (u *TodoUsecase) PostTask(payload model.TaskDTO) (taskId string, err error)
 	queryStr, args := query.MustSql()
 	var res sql.Result
 	res, err = u.Sql[constants.ConnSqlDefault].Db.Exec(queryStr, args...)
-	n, _ := res.RowsAffected()
+	var n int64
+	if res != nil {
+		n, _ = res.RowsAffected()
+	}
 	if err != nil {
 		return
 	} else if n < 1 {

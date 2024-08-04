@@ -259,3 +259,114 @@ func TestUpdate(t *testing.T) {
 		expectation.assertFn(t, mockDb, err)
 	}
 }
+
+func TestDelete(t *testing.T) {
+	type expectation struct {
+		id               string
+		isHardDelete     bool
+		prepareStatement func(mdb sqlmock.Sqlmock)
+		assertFn         func(t *testing.T, mdb sqlmock.Sqlmock, err error)
+	}
+
+	cfg := dependency.InitConfiguration()
+
+	cfg[constants.HardDelete] = ""
+
+	usecase := dependency.InitTodoUsecaseMock(cfg)
+
+	mockDb := usecase.Sql[constants.ConnSqlDefault].MockCtrl
+
+	queryHardDelete := "DELETE FROM tasks WHERE id = (.+)"
+	querySoftDelete := "UPDATE tasks SET (.+) WHERE \\(deleted_at is null OR deleted_at = 0\\) AND id = (.+) returning id"
+
+	expectations := []expectation{
+		{
+			id:           "some id",
+			isHardDelete: true, // config is not allowing hard delete
+			prepareStatement: func(mdb sqlmock.Sqlmock) {
+				cfg[constants.HardDelete] = ""
+				mdb.ExpectQuery(querySoftDelete).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow("some id"))
+			},
+			assertFn: func(t *testing.T, mdb sqlmock.Sqlmock, err error) {
+				assert.Nil(t, err)
+				assert.Nil(t, mdb.ExpectationsWereMet())
+			},
+		},
+		{
+			id:           "some id",
+			isHardDelete: true, // config is not allowing hard delete
+			prepareStatement: func(mdb sqlmock.Sqlmock) {
+				cfg[constants.HardDelete] = ""
+				mdb.ExpectQuery(querySoftDelete).WillReturnError(errors.New("some error"))
+			},
+			assertFn: func(t *testing.T, mdb sqlmock.Sqlmock, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, mdb.ExpectationsWereMet())
+			},
+		},
+		{
+			id:           "some id",
+			isHardDelete: true, // config is not allowing hard delete
+			prepareStatement: func(mdb sqlmock.Sqlmock) {
+				cfg[constants.HardDelete] = ""
+				mdb.ExpectQuery(querySoftDelete).WillReturnError(sql.ErrNoRows)
+			},
+			assertFn: func(t *testing.T, mdb sqlmock.Sqlmock, err error) {
+				var msgErr *customerror.HttpError
+				ok := errors.As(err, &msgErr)
+				assert.True(t, ok)
+				assert.Equal(t, http.StatusNotFound, msgErr.StatusCode)
+				assert.Nil(t, mdb.ExpectationsWereMet())
+			},
+		},
+		{
+			id:           "some id",
+			isHardDelete: true, // config is allowing hard delete
+			prepareStatement: func(mdb sqlmock.Sqlmock) {
+				cfg[constants.HardDelete] = "True"
+				mdb.ExpectExec(queryHardDelete).WillReturnResult(driver.RowsAffected(1))
+			},
+			assertFn: func(t *testing.T, mdb sqlmock.Sqlmock, err error) {
+				assert.Nil(t, err)
+				assert.Nil(t, mdb.ExpectationsWereMet())
+			},
+		},
+		{
+			id:           "some id",
+			isHardDelete: true, // config is allowing hard delete
+			prepareStatement: func(mdb sqlmock.Sqlmock) {
+				cfg[constants.HardDelete] = "True"
+				mdb.ExpectExec(queryHardDelete).WillReturnResult(driver.RowsAffected(0))
+			},
+			assertFn: func(t *testing.T, mdb sqlmock.Sqlmock, err error) {
+				var msgErr *customerror.HttpError
+				ok := errors.As(err, &msgErr)
+				assert.True(t, ok)
+				assert.Equal(t, http.StatusNotFound, msgErr.StatusCode)
+				assert.Nil(t, mdb.ExpectationsWereMet())
+			},
+		},
+		{
+			id:           "some id",
+			isHardDelete: true, // config is allowing hard delete
+			prepareStatement: func(mdb sqlmock.Sqlmock) {
+				cfg[constants.HardDelete] = "True"
+				mdb.ExpectExec(queryHardDelete).WillReturnError(errors.New("some error"))
+			},
+			assertFn: func(t *testing.T, mdb sqlmock.Sqlmock, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, mdb.ExpectationsWereMet())
+			},
+		},
+	}
+
+	for _, expectation := range expectations {
+		if expectation.prepareStatement != nil {
+			expectation.prepareStatement(mockDb)
+		}
+
+		err := usecase.DeleteTask(expectation.id, expectation.isHardDelete)
+
+		expectation.assertFn(t, mockDb, err)
+	}
+}

@@ -15,7 +15,7 @@ import (
 
 var returnedCols = []string{"id", "content", "status", "created_at", "created_by", "updated_at", "updated_by", "deleted_at"}
 
-func TestGetTasks(t *testing.T) {
+func TestGetTaskDetail(t *testing.T) {
 	type expectation struct {
 		id          string
 		expectError error

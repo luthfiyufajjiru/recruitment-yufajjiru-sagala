@@ -1,6 +1,7 @@
 package adapters
 
 import (
+	"sagala-todo/pkg/constants"
 	customlog "sagala-todo/pkg/custom-log"
 	"time"
 
@@ -27,6 +28,17 @@ type (
 )
 
 func (s *Sql) Init(cfg *SqlConfig) {
+	if cfg.DriverName == constants.SqlMock {
+		sqlDb, mockCtrl, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual), sqlmock.MonitorPingsOption(true))
+		if err != nil {
+			logger.Panic(err)
+		}
+
+		s.Db = sqlx.NewDb(sqlDb, cfg.DriverName)
+		s.MockCtrl = mockCtrl
+		return
+	}
+
 	sqlDB, err := sqlx.Open(cfg.DriverName, cfg.Dsn)
 	if err != nil {
 		logger.Panic("error occurred while connecting with the database", err)

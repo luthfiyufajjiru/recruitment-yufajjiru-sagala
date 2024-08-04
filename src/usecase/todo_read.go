@@ -67,7 +67,7 @@ func (u *TodoUsecase) GetTasks(limit, offset *int, search, status *string) (reco
 			logger.Info("helllo")
 			query = query.Where("status = ?", status)
 		}
-		return query
+		return query.OrderBy("created_at, id")
 	}
 
 	query := queryBuilder("*")

@@ -37,6 +37,13 @@ func (u *TodoUsecase) GetTask(taskId string) (record model.TaskPresenter, err er
 	return
 }
 func (u *TodoUsecase) GetTasks(limit, offset *int, search, status *string) (records []model.TaskPresenter, totalData int, err error) {
+	defer func() {
+		r := recover()
+		if r != nil {
+			err = fmt.Errorf("%w: %v", constants.ErrPanic, r)
+		}
+	}()
+
 	if status != nil {
 		_, available := statusMap[*status]
 		if !available {

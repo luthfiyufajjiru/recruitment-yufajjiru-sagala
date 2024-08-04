@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: Sagala Todo
+  version: 1.0.0
+servers:
+  - url: http://{{base_addr}}
+paths:
+  /v1:
+    post:
+      tags:
+        - default
+      summary: Post Task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                content: Test
+                status: Done
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:18:10 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '36'
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: 0d2da017-3c2b-4e4e-86e0-09ffec4307f3
+        '400':
+          description: Bad Request
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:17:21 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '23'
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: 'invalid payload: UM0002'
+    get:
+      tags:
+        - default
+      summary: Get Tasks
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '1'
+        - name: offset
+          in: query
+          schema:
+            type: integer
+          example: '0'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:21:00 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '225'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: success
+                data:
+                  - created_at: 1722745230
+                    created_by: null
+                    updated_at: 1722745230
+                    updated_by: null
+                    deleted_at: 0
+                    id: 5a27869a-fbc2-49b7-b733-be91685d93a1
+                    content: Test
+                    status: Done
+                total_data: 2
+  /v1/{id}:
+    put:
+      tags:
+        - default
+      summary: Update Task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                content: Test
+                status: Waiting List
+      parameters:
+        - name: hard-delete
+          in: header
+          schema:
+            type: boolean
+          example: 'true'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 0d2da017-3c2b-4e4e-86e0-09ffec4307f3
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:18:53 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '7'
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: success
+        '400':
+          description: Bad Request
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:19:08 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '14'
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: invalid status
+        '404':
+          description: Not Found
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:20:11 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '64'
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: there is no task with id of 0d2da017-3c2b-4e4e-86e0-09ffec4307f3
+    delete:
+      tags:
+        - default
+      summary: Delete Task
+      parameters:
+        - name: hard-delete
+          in: header
+          schema:
+            type: string
+          description: 'toggle this if want to hard delete '
+          example: 'True'
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 0d2da017-3c2b-4e4e-86e0-09ffec4307f3
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:19:38 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '7'
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: success
+        '404':
+          description: Not Found
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: text/plain
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:19:54 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '64'
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: there is no task with id of 0d2da017-3c2b-4e4e-86e0-09ffec4307f3
+    get:
+      tags:
+        - default
+      summary: Get Task
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+          example: 5a27869a-fbc2-49b7-b733-be91685d93a1
+      responses:
+        '200':
+          description: OK
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                example: application/json
+            Date:
+              schema:
+                type: string
+                example: Sun, 04 Aug 2024 04:20:38 GMT
+            Content-Length:
+              schema:
+                type: integer
+                example: '177'
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                created_at: 1722745230
+                created_by: null
+                updated_at: 1722745230
+                updated_by: null
+                deleted_at: 0
+                id: 5a27869a-fbc2-49b7-b733-be91685d93a1
+                content: Test
+                status: Done

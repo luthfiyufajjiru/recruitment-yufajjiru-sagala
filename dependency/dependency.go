@@ -8,6 +8,7 @@ import (
 	"sagala-todo/pkg/adapters"
 	"sagala-todo/pkg/constants"
 	"sagala-todo/src/delivery/v1http"
+	"sagala-todo/src/mocks"
 	"sagala-todo/src/usecase"
 
 	"github.com/google/wire"
@@ -66,6 +67,34 @@ func InitMigration(cfg adapters.Config) map[string]*adapters.Sql {
 			},
 		}),
 		provideSql,
+	)
+	return nil
+}
+
+func InitTodoV1HttpHandlerMockAtUsecase(cfg adapters.Config) *v1http.V1Handler {
+	wire.Build(
+		wire.Value([]string{
+			constants.DSNDefault,
+		}),
+		wire.Value([]adapters.SqlConfig{
+			{
+				RegistryName: constants.ConnSqlDefault,
+				DriverName:   constants.SqlMock,
+			},
+		}),
+		provideSql,
+		usecase.ProvideUsecase,
+		wire.Bind(new(v1http.Usecaser), new(*usecase.TodoUsecase)),
+		wire.Struct(new(v1http.V1Handler), "*"),
+	)
+	return nil
+}
+
+func InitTodoV1HttpHandlerMockAtHandler(cfg adapters.Config) *v1http.V1Handler {
+	wire.Build(
+		wire.Value(&mocks.Usecaser{}),
+		wire.Bind(new(v1http.Usecaser), new(*mocks.Usecaser)),
+		wire.Struct(new(v1http.V1Handler), "*"),
 	)
 	return nil
 }

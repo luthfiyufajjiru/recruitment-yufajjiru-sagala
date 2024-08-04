@@ -11,6 +11,7 @@ import (
 	"sagala-todo/pkg/adapters"
 	"sagala-todo/pkg/constants"
 	"sagala-todo/src/delivery/v1http"
+	"sagala-todo/src/mocks"
 	"sagala-todo/src/usecase"
 )
 
@@ -71,4 +72,39 @@ var (
 		},
 	}
 	_wireValue4 = []string{constants.DSNDefault}
+)
+
+func InitTodoV1HttpHandlerMockAtUsecase(cfg adapters.Config) *v1http.V1Handler {
+	v := _wireValue5
+	v2 := _wireValue6
+	v3 := provideSql(cfg, v, v2)
+	todoUsecase := usecase.ProvideUsecase(v3, cfg)
+	v1Handler := &v1http.V1Handler{
+		Config:  cfg,
+		Usecase: todoUsecase,
+	}
+	return v1Handler
+}
+
+var (
+	_wireValue5 = []adapters.SqlConfig{
+		{
+			RegistryName: constants.ConnSqlDefault,
+			DriverName:   constants.SqlMock,
+		},
+	}
+	_wireValue6 = []string{constants.DSNDefault}
+)
+
+func InitTodoV1HttpHandlerMockAtHandler(cfg adapters.Config) *v1http.V1Handler {
+	usecaser := _wireUsecaserValue
+	v1Handler := &v1http.V1Handler{
+		Config:  cfg,
+		Usecase: usecaser,
+	}
+	return v1Handler
+}
+
+var (
+	_wireUsecaserValue = &mocks.Usecaser{}
 )

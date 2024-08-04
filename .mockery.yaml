@@ -1,8 +1,8 @@
 with-expecter: True
-inpackage: True
-dir: src/mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }} 
+inpackage: false
+dir: src/mocks/
 mockname: "{{.InterfaceName}}"
-outpkg: "{{.PackageName}}"
+outpkg: "mocks"
 filename: "{{.InterfaceName}}.go"
 all: True
 packages:

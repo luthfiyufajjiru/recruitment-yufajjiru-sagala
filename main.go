@@ -31,7 +31,6 @@ func main() {
 	var httpServer http.Server
 
 	go signalDisrupt(cancel, osCh, logger)
-	go cmd.InitAutomationTest(ctx, cfg, &wg)
 	go cmd.InitHttpServer(ctx, cfg, &wg, &httpServer)
 
 	<-ctx.Done() // waiting for signal from os signal

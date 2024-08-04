@@ -1,0 +1,11 @@
+with-expecter: True
+inpackage: True
+dir: src/mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }} 
+mockname: "{{.InterfaceName}}"
+outpkg: "{{.PackageName}}"
+filename: "{{.InterfaceName}}.go"
+all: True
+packages:
+  sagala-todo/src/delivery/v1http:
+    config:
+      recursive: True

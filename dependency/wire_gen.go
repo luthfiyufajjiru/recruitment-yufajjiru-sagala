@@ -74,16 +74,12 @@ var (
 	_wireValue4 = []string{constants.DSNDefault}
 )
 
-func InitTodoV1HttpHandlerMockAtUsecase(cfg adapters.Config) *v1http.V1Handler {
+func InitTodoUsecaseMock(cfg adapters.Config) *usecase.TodoUsecase {
 	v := _wireValue5
 	v2 := _wireValue6
 	v3 := provideSql(cfg, v, v2)
 	todoUsecase := usecase.ProvideUsecase(v3, cfg)
-	v1Handler := &v1http.V1Handler{
-		Config:  cfg,
-		Usecase: todoUsecase,
-	}
-	return v1Handler
+	return todoUsecase
 }
 
 var (
@@ -96,7 +92,7 @@ var (
 	_wireValue6 = []string{constants.DSNDefault}
 )
 
-func InitTodoV1HttpHandlerMockAtHandler(cfg adapters.Config) *v1http.V1Handler {
+func InitTodoV1HttpHandlerMock(cfg adapters.Config) *v1http.V1Handler {
 	usecaser := _wireUsecaserValue
 	v1Handler := &v1http.V1Handler{
 		Config:  cfg,

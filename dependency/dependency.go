@@ -71,7 +71,7 @@ func InitMigration(cfg adapters.Config) map[string]*adapters.Sql {
 	return nil
 }
 
-func InitTodoV1HttpHandlerMockAtUsecase(cfg adapters.Config) *v1http.V1Handler {
+func InitTodoUsecaseMock(cfg adapters.Config) *usecase.TodoUsecase {
 	wire.Build(
 		wire.Value([]string{
 			constants.DSNDefault,
@@ -84,13 +84,11 @@ func InitTodoV1HttpHandlerMockAtUsecase(cfg adapters.Config) *v1http.V1Handler {
 		}),
 		provideSql,
 		usecase.ProvideUsecase,
-		wire.Bind(new(v1http.Usecaser), new(*usecase.TodoUsecase)),
-		wire.Struct(new(v1http.V1Handler), "*"),
 	)
 	return nil
 }
 
-func InitTodoV1HttpHandlerMockAtHandler(cfg adapters.Config) *v1http.V1Handler {
+func InitTodoV1HttpHandlerMock(cfg adapters.Config) *v1http.V1Handler {
 	wire.Build(
 		wire.Value(&mocks.Usecaser{}),
 		wire.Bind(new(v1http.Usecaser), new(*mocks.Usecaser)),

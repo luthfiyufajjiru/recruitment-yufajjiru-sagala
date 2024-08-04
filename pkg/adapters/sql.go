@@ -29,7 +29,7 @@ type (
 
 func (s *Sql) Init(cfg *SqlConfig) {
 	if cfg.DriverName == constants.SqlMock {
-		sqlDb, mockCtrl, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual), sqlmock.MonitorPingsOption(true))
+		sqlDb, mockCtrl, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp), sqlmock.MonitorPingsOption(true))
 		if err != nil {
 			logger.Panic(err)
 		}

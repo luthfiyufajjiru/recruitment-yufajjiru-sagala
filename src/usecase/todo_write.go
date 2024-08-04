@@ -107,7 +107,10 @@ func (u *TodoUsecase) DeleteTask(taskId string, isHardDelete bool) (err error) {
 		queryStr, args := query.MustSql()
 		var res sql.Result
 		res, err = u.Sql[constants.ConnSqlDefault].Db.Exec(queryStr, args...)
-		n, _ := res.RowsAffected()
+		var n int64
+		if res != nil {
+			n, _ = res.RowsAffected()
+		}
 		errNoRow := errors.Is(err, sql.ErrNoRows)
 		if err != nil && !errNoRow {
 			return

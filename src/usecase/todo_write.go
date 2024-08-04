@@ -131,7 +131,7 @@ func (u *TodoUsecase) DeleteTask(taskId string, isHardDelete bool) (err error) {
 		} else if err != nil && errNoRow {
 			err = &customerror.HttpError{
 				Message:    fmt.Sprintf("there is no task with id of %s", taskId),
-				StatusCode: http.StatusBadRequest,
+				StatusCode: http.StatusNotFound,
 			}
 			return
 		}
